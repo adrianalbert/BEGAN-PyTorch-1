@@ -29,6 +29,7 @@ import datetime
 parser = argparse.ArgumentParser(description='BEGAN-PyTorch-implementation')
 parser.add_argument('--dataset', required=True, help='CelebA', default='CelebA')
 parser.add_argument('--batchSize', type=int, default=16, help='training batch size')
+parser.add_argument('--resolution', type=int, default=64, help='training batch size')
 parser.add_argument('--testBatchSize', type=int, default=16, help='testing batch size')
 parser.add_argument('--nEpochs', type=int, default=200, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=1e-5, help='Learning Rate. Default=0.001')
@@ -73,7 +74,7 @@ root_path = "dataset/"
 
 train_transform = transforms.Compose([
     transforms.CenterCrop(160),
-    transforms.Scale(size=64),
+    transforms.Scale(size=opt.resolution),
     transforms.ToTensor(), 
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
@@ -92,7 +93,7 @@ if opt.netG:
     for parameter in netG.parameters():
         parameter.requires_grad = True
 else:
-    netG = G(h=opt.h, n=opt.n, output_dim=(3,64,64))
+    netG = G(h=opt.h, n=opt.n, output_dim=(3,opt.resolution,opt.resolution))
     netG.apply(weights_init)
 
 if opt.netD:
@@ -101,12 +102,12 @@ if opt.netD:
     for parameter in netD.parameters():
         parameter.requires_grad = True
 else:
-    netD = D(h=opt.h, n=opt.n, input_dim=(3,64,64))
+    netD = D(h=opt.h, n=opt.n, input_dim=(3,opt.resolution,opt.resolution))
     netD.apply(weights_init)
 
 print(netG)
 print(netD)
-real_A = torch.FloatTensor(opt.batchSize, 3, 64, 64)
+real_A = torch.FloatTensor(opt.batchSize, 3, opt.resolution, opt.resolution)
 z_D = torch.FloatTensor(opt.batchSize, opt.h)
 z_G = torch.FloatTensor(opt.batchSize, opt.h)
 
